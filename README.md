@@ -1,3 +1,45 @@
 # Task Manager
 
-Task Manager adalah web untuk membantu pengguna mengelola tugas secara terstruktur, mulai dari membuat, melihat, mengubah, dan menghapus tugas hingga mengatur status, prioritas, deadline, dan kategori. Web ini dilengkapi dengan fitur autentikasi dan pengelolaan profil pengguna, pencarian, filter, sorting, dashboard produktivitas, ringkasan tugas berdasarkan status, prioritas dan kategori, daftar tugas yang akan datang, serta sistem notifikasi untuk deadline hari ini, tugas yang terlambat, dan deadline yang akan datang. Sistem notifikasi juga menyediakan fitur menandai notifikasi sebagai telah dibaca dan pengelolaan notifikasi berdasarkan pengguna. Task Manager dibangun menggunakan Laravel 13 sebagai backend, PHP sebagai bahasa pemrograman, PostgreSQL sebagai database, Blade sebagai template frontend, Tailwind CSS dan Vite untuk kebutuhan tampilan dan asset frontend, Laravel Breeze untuk autentikasi, PHPUnit untuk pengujian, serta Laravel Pint untuk menjaga kualitas dan konsistensi kode. Untuk menjalankan project, pastikan PHP 8.5 atau lebih baru, Composer, Node.js dan npm, PostgreSQL, serta Git telah terpasang. Clone repository menggunakan `git clone https://github.com/RezaFahresi/task-manager.git`, masuk ke folder project menggunakan `cd task-manager`, kemudian jalankan `composer install` dan `npm install`. Buat file environment dari `.env.example`, kemudian jalankan `php artisan key:generate` dan sesuaikan konfigurasi PostgreSQL pada file `.env` dengan database, username, dan password yang digunakan. Setelah itu jalankan `php artisan migrate` untuk membuat struktur database. Web dapat dijalankan menggunakan `php artisan serve` dan diakses melalui `http://127.0.0.1:8000`, sedangkan `npm run dev` dapat digunakan untuk menjalankan Vite dalam mode development dan `npm run build` untuk membuat asset production. Sistem deadline notification dapat diperiksa secara manual menggunakan `php artisan tasks:check-deadlines`, sedangkan Laravel Scheduler dapat diperiksa menggunakan `php artisan schedule:list` dan dijalankan pada lingkungan development menggunakan `php artisan schedule:work`. Project ini juga dilengkapi dengan test untuk autentikasi, CRUD tugas, authorization, kepemilikan data, kategori, prioritas, deadline, pencarian, sorting, dashboard, notifikasi, isolasi data pengguna, dan keamanan aplikasi yang dapat dijalankan menggunakan `php artisan test`. Untuk menjaga standar penulisan kode, Laravel Pint dapat dijalankan menggunakan `vendor/bin/pint`. Dari sisi keamanan, project menerapkan authentication, authorization menggunakan Policy, validasi input, perlindungan CSRF, mass assignment protection, validasi kepemilikan notification, isolasi data antar pengguna, serta memastikan credential dan file `.env` tidak disimpan di repository. Project ini dibuat untuk keperluan pembelajaran dan pengembangan dan saat ini masih dalam tahap pengembangan.
+Web untuk membantu pengguna mengelola tugas, deadline, prioritas, dan kategori secara terstruktur.
+
+## ✨ Fitur
+
+- 🔐 Autentikasi dan pengelolaan profil
+- 📝 CRUD tugas
+- 🎯 Prioritas Low, Medium, dan High
+- 📅 Deadline dan pemantauan tugas
+- 🗂️ Kategori tugas
+- 🔎 Pencarian, filter, dan sorting
+- 📊 Dashboard produktivitas
+- 🔔 Sistem notifikasi deadline
+- 👤 Isolasi data berdasarkan pengguna
+- 📱 Responsive untuk desktop dan mobile
+
+## 🛠️ Teknologi
+
+- Laravel 13
+- PHP 8.5+
+- PostgreSQL
+- Blade
+- Tailwind CSS
+- Vite
+- Laravel Breeze
+- PHPUnit
+- Laravel Pint
+
+## 🚀 Instalasi
+
+Clone repository:
+
+```bash
+git clone https://github.com/RezaFahresi/task-manager.git
+cd task-manager
+
+#install dependency
+composer install
+npm install
+
+#buat file environtment
+cp .env.example .env
+php artisan key:generate
+
