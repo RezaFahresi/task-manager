@@ -1,0 +1,175 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --bs-primary: #4361EE;
+    --bs-primary-rgb: 67, 97, 238;
+    --bs-secondary: #8D99AE;
+    --bs-secondary-rgb: 141, 153, 174;
+    --bs-success: #10B981;
+    --bs-success-rgb: 16, 185, 129;
+    --bs-warning: #F59E0B;
+    --bs-warning-rgb: 245, 158, 11;
+    --bs-danger: #EF233C;
+    --bs-danger-rgb: 239, 35, 60;
+    --bs-dark: #2B2D42;
+    --bs-dark-rgb: 43, 45, 66;
+    --bs-body-color: #2B2D42;
+    --bs-body-bg: #EDF2F4;
+    --bs-border-color: #DFE5EC;
+
+    --brand-primary: #4361EE;
+    --brand-primary-hover: #3751D4;
+    --brand-primary-subtle: #EEF2FF;
+    --brand-secondary: #8D99AE;
+    --brand-dark: #2B2D42;
+    --brand-canvas: #EDF2F4;
+    --brand-surface: #FFFFFF;
+    --brand-border: #DFE5EC;
+    --brand-success: #10B981;
+    --brand-warning: #F59E0B;
+    --brand-danger: #EF233C;
+}
+
+body {
+    background-color: #EDF2F4;
+    color: #2B2D42;
+    font-family: 'Figtree', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+.bg-canvas {
+    background-color: #EDF2F4 !important;
+}
+.bg-surface {
+    background-color: #FFFFFF !important;
+}
+.border-subtle {
+    border-color: #DFE5EC !important;
+}
+
+.text-dark-navy {
+    color: #2B2D42 !important;
+}
+.text-muted-slate {
+    color: #8D99AE !important;
+}
+
+.btn-primary {
+    background-color: #4361EE;
+    border-color: #4361EE;
+    color: #FFFFFF;
+    font-weight: 500;
+}
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+    background-color: #3751D4 !important;
+    border-color: #3751D4 !important;
+    color: #FFFFFF !important;
+}
+
+.btn-outline-primary {
+    color: #4361EE;
+    border-color: #4361EE;
+}
+.btn-outline-primary:hover {
+    background-color: #4361EE;
+    border-color: #4361EE;
+    color: #FFFFFF;
+}
+
+.btn-secondary {
+    background-color: #FFFFFF;
+    border-color: #DFE5EC;
+    color: #2B2D42;
+}
+.btn-secondary:hover {
+    background-color: #EDF2F4;
+    border-color: #DFE5EC;
+    color: #2B2D42;
+}
+
+.btn-danger {
+    background-color: #EF233C;
+    border-color: #EF233C;
+    color: #FFFFFF;
+}
+.btn-danger:hover, .btn-danger:focus, .btn-danger:active {
+    background-color: #D90429 !important;
+    border-color: #D90429 !important;
+}
+
+.card {
+    background-color: #FFFFFF;
+    border: 1px solid #DFE5EC;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(43, 45, 66, 0.03);
+}
+
+.card-header {
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #DFE5EC;
+}
+
+.table {
+    --bs-table-color: #2B2D42;
+    --bs-table-hover-bg: #F8FAFC;
+    --bs-table-border-color: #DFE5EC;
+}
+
+.table > :not(caption) > * > * {
+    padding: 0.75rem 1rem;
+}
+
+.form-control, .form-select {
+    border-color: #DFE5EC;
+    color: #2B2D42;
+    border-radius: 6px;
+    font-size: 0.875rem;
+}
+.form-control:focus, .form-select:focus {
+    border-color: #4361EE;
+    box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.15);
+}
+
+.form-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #2B2D42;
+    margin-bottom: 0.35rem;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    background-color: #4361EE;
+    color: #FFFFFF;
+}
+
+.dot-indicator {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.badge-status-completed {
+    background-color: #ECFDF5;
+    color: #10B981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+.badge-status-pending {
+    background-color: #FFFBEB;
+    color: #D97706;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+.badge-status-overdue {
+    background-color: #FEF2F2;
+    color: #EF233C;
+    border: 1px solid rgba(239, 35, 60, 0.2);
+}
+
+.iconly-pro {
+    display: inline-block;
+    vertical-align: middle;
+}
