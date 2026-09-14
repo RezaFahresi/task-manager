@@ -43,3 +43,15 @@ npm install
 cp .env.example .env
 php artisan key:generate
 
+#Sesuaikan konfigurasi PostgreSQL pada .env, kemudian jalankan:
+php artisan migrate
+npm run build
+php artisan serve
+
+#Task Manager memiliki sistem notifikasi untuk Deadline hari ini, Task yang terlambat, Deadline yang akan datang Pengecekan deadline dapat dijalankan dengan:
+php artisan tasks:check-deadlines
+
+#Laravel Scheduler:
+php artisan schedule:list
+php artisan schedule:work
+
