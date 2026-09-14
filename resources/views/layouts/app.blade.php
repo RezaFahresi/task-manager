@@ -4,6 +4,9 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        @auth
+            <meta name="user-id" content="{{ Auth::id() }}">
+        @endauth
 
         <title>{{ $title ?? config('app.name', 'Task Manager') }}</title>
 
@@ -141,25 +144,118 @@
 
                             <!-- Right: Notifications + Profile Dropdown -->
                             <div class="d-flex align-items-center gap-2 gap-sm-3">
-                                <!-- Notifications Bell -->
-                                <a
-                                    href="{{ route('notifications.index') }}"
-                                    class="btn btn-sm position-relative p-2 rounded-2 border-0 d-inline-flex align-items-center justify-content-center"
-                                    style="color: #8D99AE; background: #F8FAFC;"
-                                    title="Notifications"
-                                    onmouseover="this.style.color='#4361EE';"
-                                    onmouseout="this.style.color='#8D99AE';"
-                                >
-                                    <x-iconly name="notification" size="18" />
-                                    @if ($sidebarUnreadCount > 0)
+                                <!-- Notifications Bell Dropdown -->
+                                <div class="dropdown" x-data="{ notifDropdownOpen: false }" @click.outside="notifDropdownOpen = false">
+                                    <button
+                                        class="btn btn-sm position-relative p-2 rounded-2 border-0 d-inline-flex align-items-center justify-content-center"
+                                        type="button"
+                                        id="notificationDropdownButton"
+                                        @click="notifDropdownOpen = !notifDropdownOpen"
+                                        style="color: #8D99AE; background: #F8FAFC;"
+                                        title="Notifications"
+                                        aria-label="Notifikasi"
+                                        onmouseover="this.style.color='#4361EE';"
+                                        onmouseout="this.style.color='#8D99AE';"
+                                    >
+                                        <x-iconly name="notification" size="18" />
                                         <span
-                                            class="position-absolute top-0 start-100 translate-middle p-1 rounded-circle border border-white"
-                                            style="background-color: #EF233C;"
+                                            id="header-notification-badge"
+                                            class="header-unread-badge position-absolute top-0 start-100 translate-middle badge rounded-pill {{ $sidebarUnreadCount > 0 ? '' : 'd-none' }}"
+                                            style="background-color: #EF233C; font-size: 9px; padding: 2px 5px; transform: translate(-30%, -20%) !important;"
                                         >
-                                            <span class="visually-hidden">New alerts</span>
+                                            <span id="header-unread-count-text">{{ $sidebarUnreadCount > 99 ? '99+' : $sidebarUnreadCount }}</span>
                                         </span>
-                                    @endif
-                                </a>
+                                    </button>
+
+                                    <div
+                                        class="dropdown-menu dropdown-menu-end shadow-sm border p-0 mt-2"
+                                        :class="{ 'show': notifDropdownOpen }"
+                                        style="border-color: #DFE5EC !important; min-width: 320px; max-width: 380px; z-index: 1060; border-radius: 12px; overflow: hidden;"
+                                    >
+                                        <!-- Dropdown Header -->
+                                        <div class="d-flex align-items-center justify-content-between px-3 py-2.5 bg-light border-bottom" style="border-color: #DFE5EC !important;">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="fw-semibold small" style="color: #2B2D42;">Notifikasi</span>
+                                                <span
+                                                    id="dropdown-unread-pill"
+                                                    class="badge rounded-pill bg-primary {{ $sidebarUnreadCount > 0 ? '' : 'd-none' }}"
+                                                    style="font-size: 10px;"
+                                                >
+                                                    <span id="dropdown-unread-count-text">{{ $sidebarUnreadCount }}</span> baru
+                                                </span>
+                                            </div>
+                                            <form id="mark-all-read-form" method="POST" action="{{ route('notifications.read-all') }}">
+                                                @csrf
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-link p-0 text-decoration-none small text-muted"
+                                                    style="font-size: 11px;"
+                                                    onmouseover="this.style.color='#4361EE';"
+                                                    onmouseout="this.style.color='#8D99AE';"
+                                                >
+                                                    Tandai semua dibaca
+                                                </button>
+                                            </form>
+                                        </div>
+
+                                        <!-- Dropdown Notifications List -->
+                                        <div id="header-notifications-list" class="overflow-y-auto" style="max-height: 320px;">
+                                            @forelse ($headerNotifications ?? [] as $item)
+                                                @php
+                                                    $isItemUnread = $item->unread();
+                                                    $itemData = $item->data;
+                                                    $itemType = $itemData['type'] ?? 'info';
+                                                    $itemTaskId = $itemData['task_id'] ?? null;
+                                                    $itemUrl = $itemData['url'] ?? ($itemTaskId ? route('tasks.show', $itemTaskId) : '#');
+                                                @endphp
+                                                <div class="notification-item p-2.5 border-bottom d-flex align-items-start gap-2.5 {{ $isItemUnread ? 'bg-primary-subtle bg-opacity-25' : '' }}" style="border-color: #F1F5F9 !important;">
+                                                    <div class="mt-1 flex-shrink-0">
+                                                        @if ($itemType === 'overdue')
+                                                            <span class="d-inline-block rounded-circle" style="width: 8px; height: 8px; background-color: #EF233C;"></span>
+                                                        @elseif ($itemType === 'due_today')
+                                                            <span class="d-inline-block rounded-circle" style="width: 8px; height: 8px; background-color: #F59E0B;"></span>
+                                                        @else
+                                                            <span class="d-inline-block rounded-circle" style="width: 8px; height: 8px; background-color: #4361EE;"></span>
+                                                        @endif
+                                                    </div>
+                                                    <div class="flex-grow-1 min-w-0">
+                                                        <a href="{{ $itemUrl }}" class="text-decoration-none d-block">
+                                                            <div class="fw-semibold text-truncate small" style="color: #2B2D42;">
+                                                                {{ $itemData['title'] ?? 'Notifikasi Task' }}
+                                                            </div>
+                                                            <div class="text-secondary small text-truncate" style="font-size: 12px;">
+                                                                {{ $itemData['message'] ?? '' }}
+                                                            </div>
+                                                        </a>
+                                                        <div class="d-flex align-items-center justify-content-between mt-1" style="font-size: 11px; color: #8D99AE;">
+                                                            <span>{{ $item->created_at->diffForHumans() }}</span>
+                                                            @if ($isItemUnread)
+                                                                <form method="POST" action="{{ route('notifications.read', $item->id) }}" class="mark-single-read-form">
+                                                                    @csrf
+                                                                    <button type="submit" class="btn btn-link p-0 text-decoration-none text-muted" style="font-size: 11px;">
+                                                                        Tandai dibaca
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @empty
+                                                <div id="header-notifications-empty" class="p-4 text-center text-muted small">
+                                                    <x-iconly name="notification" size="24" class="mb-1 opacity-50 d-block mx-auto" />
+                                                    <span>Belum ada notifikasi</span>
+                                                </div>
+                                            @endforelse
+                                        </div>
+
+                                        <!-- Dropdown Footer -->
+                                        <div class="p-2 border-top text-center bg-white" style="border-color: #DFE5EC !important;">
+                                            <a href="{{ route('notifications.index') }}" class="small text-decoration-none fw-semibold" style="color: #4361EE;">
+                                                Buka Notification Center &rarr;
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <div class="vr" style="height: 20px; color: #DFE5EC;"></div>
 
@@ -205,11 +301,9 @@
                                                         <x-iconly name="notification" size="15" style="color: #8D99AE;" />
                                                         <span>Notifications</span>
                                                     </div>
-                                                    @if ($sidebarUnreadCount > 0)
-                                                        <span class="badge rounded-pill" style="background-color: #4361EE; font-size: 10px;">
-                                                            {{ $sidebarUnreadCount }}
-                                                        </span>
-                                                    @endif
+                                                    <span class="badge rounded-pill profile-unread-badge {{ $sidebarUnreadCount > 0 ? '' : 'd-none' }}" style="background-color: #4361EE; font-size: 10px;">
+                                                        <span class="profile-unread-count-text">{{ $sidebarUnreadCount }}</span>
+                                                    </span>
                                                 </a>
                                             </li>
                                             <li class="border-top my-1" style="border-color: #DFE5EC !important;"></li>
@@ -237,10 +331,24 @@
             </div>
         </div>
 
+        <!-- Realtime Notification Toast Container -->
+        <div id="realtime-toast-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1090; max-width: 360px; width: 100%; pointer-events: none;"></div>
+
         <style>
             @media (min-width: 768px) {
                 .desktop-main-wrapper {
                     margin-left: 250px !important;
+                }
+            }
+
+            @keyframes slideInRight {
+                from {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
                 }
             }
         </style>

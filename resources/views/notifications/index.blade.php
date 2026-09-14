@@ -7,11 +7,9 @@
                 <h1 class="h3 fw-bold text-dark mb-1 tracking-tight">Notification Center</h1>
                 <p class="text-secondary small mb-0">
                     Kelola notifikasi tenggat waktu dan status task Anda.
-                    @if ($unreadCount > 0)
-                        <span class="badge bg-primary text-white rounded-pill px-2 py-0.5 ms-1 font-monospace">
-                            {{ $unreadCount }} belum dibaca
-                        </span>
-                    @endif
+                    <span id="nc-unread-pill" class="badge bg-primary text-white rounded-pill px-2 py-0.5 ms-1 font-monospace {{ $unreadCount > 0 ? '' : 'd-none' }}">
+                        {{ $unreadCount }} belum dibaca
+                    </span>
                 </p>
             </div>
             <div class="d-flex align-items-center gap-2">
@@ -57,11 +55,9 @@
                     class="btn btn-sm rounded-2 px-3 d-inline-flex align-items-center gap-2 {{ ($filter ?? '') === 'unread' ? 'btn-primary shadow-sm' : 'btn-light border-0 bg-transparent text-secondary' }} fw-medium"
                 >
                     <span>Belum Dibaca</span>
-                    @if ($unreadCount > 0)
-                        <span class="badge rounded-pill {{ ($filter ?? '') === 'unread' ? 'bg-white text-primary' : 'bg-primary-subtle text-primary' }} px-1.5 py-0.5" style="font-size: 0.68rem;">
-                            {{ $unreadCount }}
-                        </span>
-                    @endif
+                    <span id="nc-filter-unread-badge" class="badge rounded-pill {{ ($filter ?? '') === 'unread' ? 'bg-white text-primary' : 'bg-primary-subtle text-primary' }} px-1.5 py-0.5 {{ $unreadCount > 0 ? '' : 'd-none' }}" style="font-size: 0.68rem;">
+                        {{ $unreadCount }}
+                    </span>
                 </a>
             </div>
         </div>
@@ -70,7 +66,7 @@
         <div>
             @if ($notifications->isNotEmpty())
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white mb-4">
-                    <div class="list-group list-group-flush">
+                    <div id="nc-notifications-list-group" class="list-group list-group-flush">
                         @foreach ($notifications as $notification)
                             @php
                                 $isUnread = $notification->unread();
@@ -183,7 +179,7 @@
                 </div>
             @else
                 <!-- Empty State -->
-                <div class="card border-0 shadow-sm rounded-4 bg-white p-5 text-center">
+                <div id="nc-empty-card" class="card border-0 shadow-sm rounded-4 bg-white p-5 text-center">
                     <div class="py-4">
                         <div class="w-12 h-12 rounded-circle bg-light d-flex align-items-center justify-center mx-auto mb-3 text-secondary">
                             <x-iconly name="notification" class="w-6 h-6" />

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\TaskNotificationService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\DatabaseNotification;
@@ -34,7 +35,7 @@ class NotificationController extends Controller
         return view('notifications.index', compact('notifications', 'unreadCount', 'filter'));
     }
 
-    public function markAsRead(string $id): RedirectResponse
+    public function markAsRead(Request $request, string $id): RedirectResponse|JsonResponse
     {
         $user = Auth::user();
         $notification = $user->notifications()->where('id', $id)->first();
@@ -50,13 +51,27 @@ class NotificationController extends Controller
 
         $notification->markAsRead();
 
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'unread_count' => $user->unreadNotifications()->count(),
+            ]);
+        }
+
         return back()->with('success', 'Notifikasi telah ditandai sebagai dibaca.');
     }
 
-    public function markAllAsRead(): RedirectResponse
+    public function markAllAsRead(Request $request): RedirectResponse|JsonResponse
     {
         $user = Auth::user();
         $user->unreadNotifications->markAsRead();
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'unread_count' => 0,
+            ]);
+        }
 
         return back()->with('success', 'Semua notifikasi telah ditandai sebagai dibaca.');
     }

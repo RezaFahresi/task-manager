@@ -1,0 +1,181 @@
+[1mdiff --git a/.env.example b/.env.example[m
+[1mindex 40bb13b..ad716c7 100644[m
+[1m--- a/.env.example[m
+[1m+++ b/.env.example[m
+[36m@@ -33,7 +33,7 @@[m [mSESSION_ENCRYPT=false[m
+ SESSION_PATH=/[m
+ SESSION_DOMAIN=null[m
+ [m
+[31m-BROADCAST_CONNECTION=log[m
+[32m+[m[32mBROADCAST_CONNECTION=reverb[m
+ FILESYSTEM_DISK=local[m
+ QUEUE_CONNECTION=database[m
+ [m
+[36m@@ -63,3 +63,15 @@[m [mAWS_BUCKET=[m
+ AWS_USE_PATH_STYLE_ENDPOINT=false[m
+ [m
+ VITE_APP_NAME="${APP_NAME}"[m
+[32m+[m
+[32m+[m[32mREVERB_APP_ID=[m
+[32m+[m[32mREVERB_APP_KEY=[m
+[32m+[m[32mREVERB_APP_SECRET=[m
+[32m+[m[32mREVERB_HOST="localhost"[m
+[32m+[m[32mREVERB_PORT=8080[m
+[32m+[m[32mREVERB_SCHEME=http[m
+[32m+[m
+[32m+[m[32mVITE_REVERB_APP_KEY="${REVERB_APP_KEY}"[m
+[32m+[m[32mVITE_REVERB_HOST="${REVERB_HOST}"[m
+[32m+[m[32mVITE_REVERB_PORT="${REVERB_PORT}"[m
+[32m+[m[32mVITE_REVERB_SCHEME="${REVERB_SCHEME}"[m
+[1mdiff --git a/bootstrap/app.php b/bootstrap/app.php[m
+[1mindex 0c0842c..3ec4434 100644[m
+[1m--- a/bootstrap/app.php[m
+[1m+++ b/bootstrap/app.php[m
+[36m@@ -10,6 +10,7 @@[m
+     ->withRouting([m
+         web: __DIR__.'/../routes/web.php',[m
+         commands: __DIR__.'/../routes/console.php',[m
+[32m+[m[32m        channels: __DIR__.'/../routes/channels.php',[m
+         health: '/up',[m
+     )[m
+     ->withMiddleware(function (Middleware $middleware): void {[m
+[1mdiff --git a/config/broadcasting.php b/config/broadcasting.php[m
+[1mnew file mode 100644[m
+[1mindex 0000000..ebc3fb9[m
+[1m--- /dev/null[m
+[1m+++ b/config/broadcasting.php[m
+[36m@@ -0,0 +1,82 @@[m
+[32m+[m[32m<?php[m
+[32m+[m
+[32m+[m[32mreturn [[m
+[32m+[m
+[32m+[m[32m    /*[m
+[32m+[m[32m    |--------------------------------------------------------------------------[m
+[32m+[m[32m    | Default Broadcaster[m
+[32m+[m[32m    |--------------------------------------------------------------------------[m
+[32m+[m[32m    |[m
+[32m+[m[32m    | This option controls the default broadcaster that will be used by the[m
+[32m+[m[32m    | framework when an event needs to be broadcast. You may set this to[m
+[32m+[m[32m    | any of the connections defined in the "connections" array below.[m
+[32m+[m[32m    |[m
+[32m+[m[32m    | Supported: "reverb", "pusher", "ably", "redis", "log", "null"[m
+[32m+[m[32m    |[m
+[32m+[m[32m    */[m
+[32m+[m
+[32m+[m[32m    'default' => env('BROADCAST_CONNECTION', 'null'),[m
+[32m+[m
+[32m+[m[32m    /*[m
+[32m+[m[32m    |--------------------------------------------------------------------------[m
+[32m+[m[32m    | Broadcast Connections[m
+[32m+[m[32m    |--------------------------------------------------------------------------[m
+[32m+[m[32m    |[m
+[32m+[m[32m    | Here you may define all of the broadcast connections that will be used[m
+[32m+[m[32m    | to broadcast events to other systems or over WebSockets. Samples of[m
+[32m+[m[32m    | each available type of connection are provided inside this array.[m
+[32m+[m[32m    |[m
+[32m+[m[32m    */[m
+[32m+[m
+[32m+[m[32m    'connections' => [[m
+[32m+[m
+[32m+[m[32m        'reverb' => [[m
+[32m+[m[32m            'driver' => 'reverb',[m
+[32m+[m[32m            'key' => env('REVERB_APP_KEY'),[m
+[32m+[m[32m            'secret' => env('REVERB_APP_SECRET'),[m
+[32m+[m[32m            'app_id' => env('REVERB_APP_ID'),[m
+[32m+[m[32m            'options' => [[m
+[32m+[m[32m                'host' => env('REVERB_HOST'),[m
+[32m+[m[32m                'port' => env('REVERB_PORT', 443),[m
+[32m+[m[32m                'scheme' => env('REVERB_SCHEME', 'https'),[m
+[32m+[m[32m                'useTLS' => env('REVERB_SCHEME', 'https') === 'https',[m
+[32m+[m[32m            ],[m
+[32m+[m[32m            'client_options' => [[m
+[32m+[m[32m                // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html[m
+[32m+[m[32m            ],[m
+[32m+[m[32m        ],[m
+[32m+[m
+[32m+[m[32m        'pusher' => [[m
+[32m+[m[32m            'driver' => 'pusher',[m
+[32m+[m[32m            'key' => env('PUSHER_APP_KEY'),[m
+[32m+[m[32m            'secret' => env('PUSHER_APP_SECRET'),[m
+[32m+[m[32m            'app_id' => env('PUSHER_APP_ID'),[m
+[32m+[m[32m            'options' => [[m
+[32m+[m[32m                'cluster' => env('PUSHER_APP_CLUSTER'),[m
+[32m+[m[32m                'host' => env('PUSHER_HOST') ?: 'api-'.env('PUSHER_APP_CLUSTER', 'mt1').'.pusher.com',[m
+[32m+[m[32m                'port' => env('PUSHER_PORT', 443),[m
+[32m+[m[32m                'scheme' => env('PUSHER_SCHEME', 'https'),[m
+[32m+[m[32m                'encrypted' => true,[m
+[32m+[m[32m                'useTLS' => env('PUSHER_SCHEME', 'https') === 'https',[m
+[32m+[m[32m            ],[m
+[32m+[m[32m            'client_options' => [[m
+[32m+[m[32m                // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html[m
+[32m+[m[32m            ],[m
+[32m+[m[32m        ],[m
+[32m+[m
+[32m+[m[32m        'ably' => [[m
+[32m+[m[32m            'driver' => 'ably',[m
+[32m+[m[32m            'key' => env('ABLY_KEY'),[m
+[32m+[m[32m        ],[m
+[32m+[m
+[32m+[m[32m        'log' => [[m
+[32m+[m[32m            'driver' => 'log',[m
+[32m+[m[32m        ],[m
+[32m+[m
+[32m+[m[32m        'null' => [[m
+[32m+[m[32m            'driver' => 'null',[m
+[32m+[m[32m        ],[m
+[32m+[m
+[32m+[m[32m    ],[m
+[32m+[m
+[32m+[m[32m];[m
+[1mdiff --git a/config/reverb.php b/config/reverb.php[m
+[1mnew file mode 100644[m
+[1mindex 0000000..91f3880[m
+[1m--- /dev/null[m
+[1m+++ b/config/reverb.php[m
+[36m@@ -0,0 +1,102 @@[m
+[32m+[m[32m<?php[m
+[32m+[m
+[32m+[m[32mreturn [[m
+[32m+[m
+[32m+[m[32m    /*[m
+[32m+[m[32m    |--------------------------------------------------------------------------[m
+[32m+[m[32m    | Default Reverb Server[m
+[32m+[m[32m    |--------------------------------------------------------------------------[m
+[32m+[m[32m    |[m
+[32m+[m[32m    | This option controls the default server used by Reverb to handle[m
+[32m+[m[32m    | incoming messages as well as broadcasting message to all your[m
+[32m+[m[32m    | connected clients. At this time only "reverb" is supported.[m
+[32m+[m[32m    |[m
+[32m+[m[32m    */[m
+[32m+[m
+[32m+[m[32m    'default' => env('REVERB_SERVER', 'reverb'),[m
+[32m+[m
+[32m+[m[32m    /*[m
+[32m+[m[32m    |--------------------------------------------------------------------------[m
+[32m+[m[32m    | Reverb Servers[m
+[32m+[m[32m    |--------------------------------------------------------------------------[m
+[32m+[m[32m    |[m
+[32m+[m[32m    | Here you may define details for each of the supported Reverb servers.[m
+[32m+[m[32m    | Each server has its own configuration options that are defined in[m
+[32m+[m[32m    | the array below. You should ensure all the options are present.[m
+[32m+[m[32m    |[m
+[32m+[m[32m    */[m
+[32m+[m
+[32m+[m[32m    'servers' => [[m
+[32m+[m
+[32m+[m[32m        'reverb' => [[m
+[32m+[m[32m            'host' => env('REVERB_SERVER_HOST', '0.0.0.0'),[m
+[32m+[m[32m            'port' => env('REVERB_SERVER_PORT', 8080),[m
+[32m+[m[32m            'path' => env('REVERB_SERVER_PATH', ''),[m
+[32m+[m[32m            'hostname' => env('REVERB_HOST'),[m
+[32m+[m[32m            'options' => [[m
+[32m+[m[32m                'tls' => [],[m
+[32m+[m[32m            ],[m
+[32m+[m[32m            'max_request_size' => env('REVERB_MAX_REQUEST_SIZE', 10_000),[m
+[32m+[m[32m            'scaling' => [[m
+[32m+[m[32m                'enabled' => env('REVERB_SCALING_ENABLED', false),[m
+[32m+[m[32m                'channel' => env('REVERB_SCALING_CHANNEL', 'reverb'),[m
+[32m+[m[32m                'server' => [[m
+[32m+[m[32m                    'url' => env('REDIS_URL'),[m
+[32m+[m[32m                    'host' => env('REDIS_HOST', '127.0.0.1'),[m
+[32m+[m[32m                    'port' => e

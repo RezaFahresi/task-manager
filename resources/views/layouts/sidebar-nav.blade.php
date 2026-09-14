@@ -44,11 +44,12 @@
             @php
                 $sidebarUnreadCount = $unreadNotificationCount ?? 0;
             @endphp
-            @if ($sidebarUnreadCount > 0)
-                <span class="badge rounded-pill" style="background-color: #4361EE; color: #FFFFFF; font-size: 10px; font-weight: 600; padding: 3px 7px;">
-                    {{ $sidebarUnreadCount }}
-                </span>
-            @endif
+            <span
+                class="badge rounded-pill sidebar-unread-badge {{ $sidebarUnreadCount > 0 ? '' : 'd-none' }}"
+                style="background-color: #4361EE; color: #FFFFFF; font-size: 10px; font-weight: 600; padding: 3px 7px;"
+            >
+                <span class="sidebar-unread-count-text">{{ $sidebarUnreadCount }}</span>
+            </span>
         </a>
 
         <div class="my-2 border-top" style="border-color: #DFE5EC !important;"></div>

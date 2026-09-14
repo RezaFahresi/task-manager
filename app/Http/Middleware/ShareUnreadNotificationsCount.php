@@ -16,9 +16,12 @@ class ShareUnreadNotificationsCount
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check()) {
-            View::share('unreadNotificationCount', Auth::user()->unreadNotifications()->count());
+            $user = Auth::user();
+            View::share('unreadNotificationCount', $user->unreadNotifications()->count());
+            View::share('headerNotifications', $user->unreadNotifications()->latest()->take(5)->get());
         } else {
             View::share('unreadNotificationCount', 0);
+            View::share('headerNotifications', collect());
         }
 
         return $next($request);
