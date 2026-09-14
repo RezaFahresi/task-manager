@@ -19,6 +19,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         ViewServiceProvider::class,
     ])
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
         $middleware->web(append: [
             SecurityHeaders::class,
             ShareUnreadNotificationsCount::class,

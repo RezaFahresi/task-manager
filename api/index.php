@@ -52,5 +52,44 @@ if (isset($_ENV['VERCEL']) || isset($_SERVER['VERCEL']) || getenv('VERCEL')) {
     }
 }
 
-// 2. Delegate to public/index.php
+// 2. Serve static files directly if requested through this entrypoint
+$uri = urldecode(
+    parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? ''
+);
+
+$publicPath = realpath(__DIR__.'/../public');
+$targetPath = $publicPath ? realpath($publicPath.$uri) : false;
+
+if ($targetPath && $publicPath && str_starts_with($targetPath, $publicPath) && is_file($targetPath) && $targetPath !== $publicPath.DIRECTORY_SEPARATOR.'index.php') {
+    $extension = strtolower(pathinfo($targetPath, PATHINFO_EXTENSION));
+    $mimeTypes = [
+        'css' => 'text/css',
+        'js' => 'application/javascript',
+        'mjs' => 'application/javascript',
+        'json' => 'application/json',
+        'png' => 'image/png',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'gif' => 'image/gif',
+        'svg' => 'image/svg+xml',
+        'ico' => 'image/x-icon',
+        'webp' => 'image/webp',
+        'woff' => 'font/woff',
+        'woff2' => 'font/woff2',
+        'ttf' => 'font/ttf',
+        'eot' => 'application/vnd.ms-fontobject',
+        'map' => 'application/json',
+        'txt' => 'text/plain',
+    ];
+
+    $mimeType = $mimeTypes[$extension] ?? (mime_content_type($targetPath) ?: 'application/octet-stream');
+    header('Content-Type: '.$mimeType);
+    if (str_starts_with($uri, '/build/assets/')) {
+        header('Cache-Control: public, max-age=31536000, immutable');
+    }
+    readfile($targetPath);
+    exit;
+}
+
+// 3. Delegate to public/index.php
 require __DIR__.'/../public/index.php';
