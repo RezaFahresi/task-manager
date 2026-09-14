@@ -87,10 +87,10 @@
 
                 <!-- Category Select -->
                 <div class="col-6 col-md-2 col-xl-2">
-                    <select name="category" class="form-select form-select-sm" style="border-color: #DFE5EC; color: #2B2D42;">
+                    <select name="category_id" class="form-select form-select-sm" style="border-color: #DFE5EC; color: #2B2D42;">
                         <option value="">Semua Kategori</option>
                         @foreach ($categories as $cat)
-                            <option value="{{ $cat->id }}" {{ (string) request('category') === (string) $cat->id || request('category') === $cat->name ? 'selected' : '' }}>
+                            <option value="{{ $cat->id }}" {{ (string) request('category_id') === (string) $cat->id || (string) request('category') === (string) $cat->id || request('category') === $cat->name ? 'selected' : '' }}>
                                 {{ $cat->name }}
                             </option>
                         @endforeach

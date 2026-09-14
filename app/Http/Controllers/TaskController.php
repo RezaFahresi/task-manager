@@ -6,6 +6,7 @@ use App\Http\Requests\TaskRequest;
 use App\Models\Category;
 use App\Models\Task;
 use App\Services\TaskNotificationService;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,6 +41,7 @@ class TaskController extends Controller
             ->count();
 
         $dueTodayTasks = Task::where('user_id', $userId)
+            ->where('status', 'pending')
             ->whereDate('due_date', today())
             ->count();
 
@@ -142,10 +144,11 @@ class TaskController extends Controller
             ->where('user_id', Auth::id());
 
         if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'ilike', "%{$search}%")
-                    ->orWhere('description', 'ilike', "%{$search}%");
+            $search = (string) $request->input('search');
+            $escapedSearch = addcslashes($search, '%_\\');
+            $query->where(function ($q) use ($escapedSearch) {
+                $q->where('title', 'ilike', "%{$escapedSearch}%")
+                    ->orWhere('description', 'ilike', "%{$escapedSearch}%");
             });
         }
 
@@ -160,8 +163,19 @@ class TaskController extends Controller
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->input('category_id'));
         } elseif ($request->filled('category')) {
-            $categoryParam = $request->input('category');
-            if (is_numeric($categoryParam)) {
+            $categoryParam = (string) $request->input('category');
+
+            // Prioritize matching category by name for this user (supports numeric names like "2026")
+            $matchingCategoryByName = Category::where('user_id', Auth::id())
+                ->where(function ($q) use ($categoryParam) {
+                    $q->where('name', $categoryParam)
+                        ->orWhere('name', 'ilike', $categoryParam);
+                })
+                ->first();
+
+            if ($matchingCategoryByName) {
+                $query->where('category_id', $matchingCategoryByName->id);
+            } elseif (is_numeric($categoryParam)) {
                 $query->where('category_id', (int) $categoryParam);
             } else {
                 $query->whereHas('category', function ($q) use ($categoryParam) {
@@ -175,7 +189,7 @@ class TaskController extends Controller
             match ($deadlineFilter) {
                 'today', 'hari_ini' => $query->whereDate('due_date', today()),
                 'upcoming', 'mendatang' => $query->whereDate('due_date', '>', today()),
-                'overdue', 'terlambat' => $query->whereDate('due_date', '<', today()),
+                'overdue', 'terlambat' => $query->where('status', 'pending')->whereDate('due_date', '<', today()),
                 default => null,
             };
         }
@@ -217,6 +231,11 @@ class TaskController extends Controller
     {
         $validated = $request->validated();
 
+        if (! empty($validated['due_date']) && ! empty($request->input('due_time'))) {
+            $validated['due_date'] = Carbon::parse($validated['due_date'].' '.$request->input('due_time'))->format('Y-m-d H:i:s');
+        }
+        unset($validated['due_time']);
+
         Task::create([
             'user_id' => Auth::id(),
             'title' => $validated['title'],
@@ -243,7 +262,7 @@ class TaskController extends Controller
 
     public function edit(Task $task): View
     {
-        Gate::authorize('view', $task);
+        Gate::authorize('update', $task);
 
         $categories = Category::where('user_id', Auth::id())
             ->orderBy('name')
@@ -260,6 +279,13 @@ class TaskController extends Controller
         if (array_key_exists('priority', $validated) && $validated['priority'] === null) {
             $validated['priority'] = 'medium';
         }
+
+        if (! empty($validated['due_date']) && ! empty($request->input('due_time'))) {
+            $validated['due_date'] = Carbon::parse($validated['due_date'].' '.$request->input('due_time'))->format('Y-m-d H:i:s');
+        } elseif (array_key_exists('due_date', $validated) && empty($validated['due_date'])) {
+            $validated['due_date'] = null;
+        }
+        unset($validated['due_time']);
 
         $task->update($validated);
 

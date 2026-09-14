@@ -10,6 +10,9 @@
 
         <title>{{ $title ?? config('app.name', 'Task Manager') }}</title>
 
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="{{ asset('images/task-manager-logo.png') }}">
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
@@ -47,9 +50,12 @@
             >
                 <div class="d-flex align-items-center justify-content-between px-3 border-bottom" style="height: 60px; border-color: #DFE5EC !important;">
                     <a href="{{ route('dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none" style="color: #2B2D42;">
-                        <span class="d-inline-flex align-items-center justify-content-center rounded-2" style="width: 28px; height: 28px; background-color: #EEF2FF; color: #4361EE;">
-                            <x-iconly name="tick-square" size="18" />
-                        </span>
+                        <img
+                            src="{{ asset('images/task-manager-logo.png') }}"
+                            alt="{{ config('app.name', 'Task Manager') }}"
+                            class="rounded-2"
+                            style="width: 28px; height: 28px; object-fit: contain;"
+                        />
                         <span class="fw-bold tracking-tight" style="font-size: 15px;">Task Manager</span>
                     </a>
                     <button
@@ -73,9 +79,12 @@
                 <!-- Brand Header -->
                 <div class="d-flex align-items-center px-4 border-bottom" style="height: 60px; border-color: #DFE5EC !important;">
                     <a href="{{ route('dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none" style="color: #2B2D42;">
-                        <span class="d-inline-flex align-items-center justify-content-center rounded-2" style="width: 30px; height: 30px; background-color: #EEF2FF; color: #4361EE;">
-                            <x-iconly name="tick-square" size="19" />
-                        </span>
+                        <img
+                            src="{{ asset('images/task-manager-logo.png') }}"
+                            alt="{{ config('app.name', 'Task Manager') }}"
+                            class="rounded-2"
+                            style="width: 32px; height: 32px; object-fit: contain;"
+                        />
                         <span class="fw-bold tracking-tight" style="font-size: 15px;">Task Manager</span>
                     </a>
                 </div>
@@ -198,6 +207,21 @@
                                             </form>
                                         </div>
 
+                                        <!-- Quick Notification Preferences (Browser & Sound) -->
+                                        <div class="px-3 py-1.5 bg-light-subtle border-bottom d-flex align-items-center justify-content-between" style="border-color: #F1F5F9 !important; font-size: 11px;">
+                                            <div class="d-flex align-items-center gap-1">
+                                                <button type="button" id="tm-toggle-sound-btn" class="btn btn-link p-0 text-decoration-none text-muted d-inline-flex align-items-center gap-1" style="font-size: 11px;" title="Aktifkan/Nonaktifkan Suara Pengingat">
+                                                    <span id="tm-sound-icon">🔔</span>
+                                                    <span id="tm-sound-status-text">Suara: Off</span>
+                                                </button>
+                                            </div>
+                                            <div id="tm-browser-notif-wrapper">
+                                                <button type="button" id="tm-request-browser-notif-btn" class="btn btn-link p-0 text-decoration-none text-primary fw-medium" style="font-size: 11px;">
+                                                    Aktifkan Notif Browser
+                                                </button>
+                                            </div>
+                                        </div>
+
                                         <!-- Dropdown Notifications List -->
                                         <div id="header-notifications-list" class="overflow-y-auto" style="max-height: 320px;">
                                             @forelse ($headerNotifications ?? [] as $item)
@@ -210,8 +234,10 @@
                                                 @endphp
                                                 <div class="notification-item p-2.5 border-bottom d-flex align-items-start gap-2.5 {{ $isItemUnread ? 'bg-primary-subtle bg-opacity-25' : '' }}" style="border-color: #F1F5F9 !important;">
                                                     <div class="mt-1 flex-shrink-0">
-                                                        @if ($itemType === 'overdue')
+                                                        @if ($itemType === 'overdue' || $itemType === 'reminder_10m')
                                                             <span class="d-inline-block rounded-circle" style="width: 8px; height: 8px; background-color: #EF233C;"></span>
+                                                        @elseif ($itemType === 'reminder_1h')
+                                                            <span class="d-inline-block rounded-circle" style="width: 8px; height: 8px; background-color: #4F46E5;"></span>
                                                         @elseif ($itemType === 'due_today')
                                                             <span class="d-inline-block rounded-circle" style="width: 8px; height: 8px; background-color: #F59E0B;"></span>
                                                         @else

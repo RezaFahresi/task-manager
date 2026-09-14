@@ -61,7 +61,7 @@
                                 </td>
                                 <td class="py-3.5 text-center">
                                     <a
-                                        href="{{ route('tasks.index', ['category' => $category->id]) }}"
+                                        href="{{ route('tasks.index', ['category_id' => $category->id]) }}"
                                         class="badge bg-light text-secondary border text-decoration-none px-2.5 py-1.5 rounded-pill fw-medium hover-lift"
                                     >
                                         {{ $category->tasks_count }} task

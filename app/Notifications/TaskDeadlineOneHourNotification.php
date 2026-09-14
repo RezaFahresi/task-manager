@@ -10,7 +10,7 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class TaskDueTodayNotification extends Notification implements ShouldBroadcast, ShouldQueue
+class TaskDeadlineOneHourNotification extends Notification implements ShouldBroadcast, ShouldQueue
 {
     use Queueable;
 
@@ -44,17 +44,17 @@ class TaskDueTodayNotification extends Notification implements ShouldBroadcast, 
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $dueDate = $this->task->due_date?->format('d M Y') ?? 'Hari Ini';
+        $dueDate = $this->task->due_date ? $this->task->due_date->format('d M Y, H:i') : '1 Jam Lagi';
         $url = route('tasks.show', $this->task);
 
         return (new MailMessage)
-            ->subject("[Pengingat] Task Jatuh Tempo Hari Ini: {$this->task->title}")
+            ->subject("[Pengingat] 1 Jam Menuju Deadline: {$this->task->title}")
             ->view('emails.task-reminder', [
                 'user' => $notifiable,
                 'task' => $this->task,
-                'type' => 'due_today',
-                'heading' => 'Task Jatuh Tempo Hari Ini',
-                'messageContent' => 'Task "'.$this->task->title.'" dijadwalkan jatuh tempo hari ini. Harap segera periksa dan selesaikan task Anda.',
+                'type' => 'reminder_1h',
+                'heading' => 'Pengingat Deadline: 1 Jam Tersisa',
+                'messageContent' => 'Task "'.$this->task->title.'" akan segera jatuh tempo dalam 1 jam ke depan. Harap selesaikan pekerjaan Anda tepat waktu.',
                 'dueDate' => $dueDate,
                 'url' => $url,
             ]);
@@ -70,11 +70,13 @@ class TaskDueTodayNotification extends Notification implements ShouldBroadcast, 
         return [
             'task_id' => $this->task->id,
             'task_title' => $this->task->title,
-            'title' => 'Task Jatuh Tempo Hari Ini',
-            'message' => 'Task "'.$this->task->title.'" jatuh tempo hari ini.',
-            'type' => 'due_today',
-            'due_date' => $this->task->due_date?->toDateString(),
+            'title' => 'Pengingat: 1 Jam Menuju Deadline',
+            'message' => 'Task "'.$this->task->title.'" jatuh tempo dalam 1 jam.',
+            'type' => 'reminder_1h',
+            'notification_type' => 'reminder_1h',
+            'due_date' => $this->getDeadlineString(),
             'url' => route('tasks.show', $this->task),
+            'urgency' => 'normal',
         ];
     }
 
@@ -87,13 +89,23 @@ class TaskDueTodayNotification extends Notification implements ShouldBroadcast, 
             'id' => $this->id,
             'task_id' => $this->task->id,
             'task_title' => $this->task->title,
-            'title' => 'Task Jatuh Tempo Hari Ini',
-            'message' => 'Task "'.$this->task->title.'" jatuh tempo hari ini.',
-            'type' => 'due_today',
-            'notification_type' => 'due_today',
-            'due_date' => $this->task->due_date?->toDateString(),
+            'title' => 'Pengingat: 1 Jam Menuju Deadline',
+            'message' => 'Task "'.$this->task->title.'" jatuh tempo dalam 1 jam.',
+            'type' => 'reminder_1h',
+            'notification_type' => 'reminder_1h',
+            'due_date' => $this->getDeadlineString(),
             'url' => route('tasks.show', $this->task),
+            'urgency' => 'normal',
             'created_at' => now()->diffForHumans(),
         ]))->onConnection('sync');
+    }
+
+    protected function getDeadlineString(): ?string
+    {
+        if (! $this->task->due_date) {
+            return null;
+        }
+
+        return $this->task->due_date->format('Y-m-d H:i:s');
     }
 }

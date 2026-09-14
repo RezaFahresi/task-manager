@@ -32,11 +32,18 @@ class AppServiceProvider extends ServiceProvider
                     {
                         protected function whereBasic(Builder $query, $where)
                         {
+                            $isLike = in_array(strtolower($where['operator']), ['ilike', 'like'], true);
                             if (strtolower($where['operator']) === 'ilike') {
                                 $where['operator'] = 'like';
                             }
 
-                            return parent::whereBasic($query, $where);
+                            $sql = parent::whereBasic($query, $where);
+
+                            if ($isLike) {
+                                $sql .= " escape '\\'";
+                            }
+
+                            return $sql;
                         }
                     };
                 }

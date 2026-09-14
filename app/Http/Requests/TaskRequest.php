@@ -29,6 +29,7 @@ class TaskRequest extends FormRequest
             'status' => 'required|in:pending,completed',
             'priority' => ['nullable', 'string', Rule::in(['low', 'medium', 'high'])],
             'due_date' => ['nullable', 'date'],
+            'due_time' => ['nullable', 'string'],
             'category_id' => [
                 'nullable',
                 'integer',

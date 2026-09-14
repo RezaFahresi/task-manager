@@ -159,15 +159,26 @@
                         <!-- Deadline Input -->
                         <div class="col-12 col-md-4">
                             <label for="due_date" class="form-label text-dark fw-semibold small mb-1.5">
-                                Deadline <span class="text-secondary fw-normal">(Opsional)</span>
+                                Deadline & Jam <span class="text-secondary fw-normal">(Opsional)</span>
                             </label>
-                            <input
-                                type="date"
-                                id="due_date"
-                                name="due_date"
-                                value="{{ old('due_date') }}"
-                                class="form-control form-control-md rounded-3 @error('due_date') is-invalid @enderror"
-                            >
+                            <div class="input-group">
+                                <input
+                                    type="date"
+                                    id="due_date"
+                                    name="due_date"
+                                    value="{{ old('due_date') }}"
+                                    class="form-control form-control-md rounded-start-3 @error('due_date') is-invalid @enderror"
+                                >
+                                <input
+                                    type="time"
+                                    id="due_time"
+                                    name="due_time"
+                                    value="{{ old('due_time') }}"
+                                    class="form-control form-control-md rounded-end-3"
+                                    style="max-width: 120px;"
+                                    title="Jam deadline (opsional)"
+                                >
+                            </div>
                             @error('due_date')
                                 <div class="invalid-feedback d-block small mt-1.5 text-danger">{{ $message }}</div>
                             @enderror

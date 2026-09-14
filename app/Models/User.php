@@ -40,4 +40,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Category::class);
     }
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (User $user): void {
+            $user->notifications()->delete();
+        });
+    }
 }

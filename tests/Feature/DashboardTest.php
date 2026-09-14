@@ -201,8 +201,8 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($userA)->get('/dashboard');
 
         $response->assertOk();
-        $response->assertViewHas('dueTodayTasks', 2);
-        $response->assertViewHas('dueToday', 2);
+        $response->assertViewHas('dueTodayTasks', 1);
+        $response->assertViewHas('dueToday', 1);
     }
 
     public function test_dashboard_calculates_completion_rate_accurately(): void

@@ -11,3 +11,7 @@ Artisan::command('inspire', function () {
 Schedule::command('tasks:check-deadlines')
     ->daily()
     ->description('Check task deadlines and dispatch in-app notifications daily');
+
+Schedule::command('tasks:smart-reminders')
+    ->everyMinute()
+    ->description('Check smart deadline reminders (1 hour, 10 min, overdue)');

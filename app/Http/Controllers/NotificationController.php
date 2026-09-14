@@ -90,6 +90,16 @@ class NotificationController extends Controller
             abort(404, 'Notifikasi tidak ditemukan.');
         }
 
+        $data = $notification->data;
+        if (is_array($data) && isset($data['task_id'], $data['type'])) {
+            $this->notificationService->markAsDismissed(
+                userId: $user->id,
+                taskId: (int) $data['task_id'],
+                type: (string) $data['type'],
+                dueDate: isset($data['due_date']) ? (string) $data['due_date'] : null
+            );
+        }
+
         $notification->delete();
 
         return back()->with('success', 'Notifikasi berhasil dihapus.');
